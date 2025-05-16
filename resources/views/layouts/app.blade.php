@@ -225,7 +225,19 @@
                     <div class="flex justify-between items-center">
                         <h1 class="text-xl font-semibold">{{ config('app.name', 'Laravel') }}</h1>
                         <div>
-                            <a href="{{ route('products.index') }}" class="text-blue-600">Products</a>
+                            <a href="{{ route('products.index') }}" class="text-blue-600 px-3">Products</a>
+                            @guest
+                                <a href="{{ route('login') }}" class="text-blue-600 px-3">{{ __('Login') }}</a>
+                                <a href="{{ route('register') }}" class="text-blue-600 px-3">{{ __('Register') }}</a>
+                            @else
+                                <span class="px-3">{{ Auth::user()->name }}</span>
+                                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="text-blue-600 px-3">
+                                    {{ __('Logout') }}
+                                </a>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                    @csrf
+                                </form>
+                            @endguest
                         </div>
                     </div>
                 </div>
@@ -242,7 +254,7 @@
 
             <!-- Page Content -->
             <main>
-                {{ $slot }}
+                @yield('content')
             </main>
         </div>
     </body>

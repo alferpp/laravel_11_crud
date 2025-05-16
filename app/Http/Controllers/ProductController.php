@@ -31,12 +31,14 @@ class ProductController extends Controller
     /** 
      * Store a newly created resource in storage. 
      */ 
-    public function store(StoreProductRequest $request) : 
-RedirectResponse 
+    public function store(StoreProductRequest $request) : RedirectResponse 
     { 
-        Product::create($request->validated()); 
- 
-        return redirect()->route('products.index') 
+        $data = $request->validated();
+        if ($request->hasFile('product_image')) {
+            $data['product_image'] = $request->file('product_image')->store('product_images', 'public');
+        }
+        Product::create($data);
+        return redirect()->route('products.index')
                 ->withSuccess('New product is added successfully.'); 
     } 
  
@@ -59,12 +61,16 @@ RedirectResponse
     /** 
      * Update the specified resource in storage. 
      */ 
-    public function update(UpdateProductRequest $request, Product 
-$product) : RedirectResponse 
+    public function update(UpdateProductRequest $request, Product $product) : RedirectResponse 
     { 
-        $product->update($request->validated()); 
- 
-        return redirect()->back() 
+        $data = $request->validated();
+        if ($request->hasFile('product_image')) {
+            $data['product_image'] = $request->file('product_image')->store('product_images', 'public');
+        } else {
+            unset($data['product_image']); // Don't overwrite if not uploading
+        }
+        $product->update($data);
+        return redirect()->route('products.index')
                 ->withSuccess('Product is updated successfully.');
     }
 
